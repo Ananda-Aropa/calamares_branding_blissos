@@ -3,17 +3,12 @@
 # Exit Immediately if a command fails
 set -e
 
-GITHUB_ENV=$(readlink -f "$GITHUB_ENV")
-
 cd "$(dirname "$0")"
 
 DISTRO="${DISTRO:-unstable}"
 MAINTAINER=$(git log -1 --pretty=format:'%an <%ae>')
 VERSION=$(cat ../VERSION | cut -d'v' -f2)
 REVISION=${REVISION:-0}
-
-echo "VERSION=$VERSION" >>"$GITHUB_ENV"
-echo "DATE=$(date -u +'%Y%m%d')" >>"$GITHUB_ENV"
 
 # Gen changelog (from latest commit)
 MSG=$(git log -1 --pretty=format:'%s')

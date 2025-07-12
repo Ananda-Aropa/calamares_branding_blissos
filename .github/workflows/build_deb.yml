@@ -96,6 +96,14 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Setup variables
+        run: |
+          echo "VERSION=$(cat VERSION | cut -d'v' -f2)" >>"$GITHUB_ENV"
+          echo "DATE=$(date -u +'%Y%m%d')" >>"$GITHUB_ENV"
+
       - name: Download blissos-calamares
         id: download-blissos-calamares
         uses: actions/download-artifact@v4
