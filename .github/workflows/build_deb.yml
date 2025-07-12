@@ -83,6 +83,7 @@ jobs:
           QUEUE: ${{ env.QUEUE }}
           REF: ${{ env.REF }}
         run: |
+          BRANCH=${REF##*/}
           git clone -b $BRANCH https://github.com/$QUEUE queue
           cd queue
           git config --global user.email "action@github.com"
