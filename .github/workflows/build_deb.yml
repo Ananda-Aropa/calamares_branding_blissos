@@ -13,6 +13,12 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  REPO: ${{ github.repository }}
+  REVISION: ${{ github.run_number }}
+  PAT: ${{ secrets.RELEASE_TOKEN }}
+  QUEUE: Ananda-Aropa/aaropa_debian_queue
+
 jobs:
   build:
     strategy:
@@ -20,11 +26,29 @@ jobs:
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Enqueue
+        env:
+          REPO: ${{ env.REPO }}
+          DESTINATION_REPO_PAT: ${{ env.PAT }}
+        run: |
+          git clone -b main https://github.com/${{ env.QUEUE }} queue
+          cd queue
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          touch ${REPO##*/}
+          git add ${REPO##*/}
+          git commit -m "Enqueue ${REPO}"
+          git push origin main
+          cd ..
+
       - name: Check out
         uses: actions/checkout@v4
 
+      - name: Set up source files
+        run: ./debian/setup.sh
+
       - name: Build DEB package
-        uses: DevChall-by-SDCY-and-VXM/debian-buildpackage-template@main
+        uses: Ananda-Aropa/build-deb@main
         with:
           distro: debian:unstable-slim
           arch: amd64
@@ -43,10 +67,24 @@ jobs:
             *_*_*.deb
             *_*_*.udeb
 
+      - name: Dequeue
+        env:
+          REPO: ${{ env.REPO }}
+          DESTINATION_REPO_PAT: ${{ env.PAT }}
+        run: |
+          git clone -b main https://github.com/${{ env.QUEUE }} queue
+          cd queue
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          rm -rf ${REPO##*/}
+          git add .
+          git commit -m "Dequeue ${REPO}"
+          git push origin main
+          cd ..
+
   release:
     name: Release
     needs: build
-    if: ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') && startsWith(github.ref, 'refs/tags/'))
     runs-on: ubuntu-latest
     steps:
       - name: Download blissos-calamares
@@ -64,30 +102,7 @@ jobs:
         with:
           token: "${{ secrets.RELEASE_TOKEN }}"
           prerelease: false
-          files: |
-            ${{ steps.download-blissos-calamares.outputs.download-path }}/*
-
-  monthly-release:
-    name: Monthly release
-    needs: build
-    if: (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download blissos-calamares
-        id: download-blissos-calamares
-        uses: actions/download-artifact@v4
-        with:
-          path: out
-          pattern: "*"
-          merge-multiple: true
-      - name: List Files
-        run: ls -R ${{ steps.download-blissos-calamares.outputs.download-path }}
-
-      - uses: "softprops/action-gh-release@v2.1.0"
-        with:
-          token: "${{ secrets.RELEASE_TOKEN }}"
-          prerelease: false
-          tag_name: "1.0.0-${{ github.run_number }}"
-          name: "Monthly release 1.0.0-${{ github.run_number }}"
+          tag_name: "${{ env.VERSION }}-${{ env.REVISION }}"
+          name: "Release ${{ env.VERSION }}-${{ env.REVISION }}-${{ env.DATE }}"
           files: |
             ${{ steps.download-blissos-calamares.outputs.download-path }}/*
