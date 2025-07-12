@@ -16,6 +16,7 @@ on:
 env:
   REPO: ${{ github.repository }}
   REVISION: ${{ github.run_number }}
+  AUTHOR: ${{ secrets.RELEASE_USERNAME }}
   PAT: ${{ secrets.RELEASE_TOKEN }}
   QUEUE: Ananda-Aropa/aaropa_debian_queue
 
@@ -29,17 +30,21 @@ jobs:
       - name: Enqueue
         env:
           REPO: ${{ env.REPO }}
-          DESTINATION_REPO_PAT: ${{ env.PAT }}
+          GITHUB_USER: ${{ env.AUTHOR }}
+          GITHUB_TOKEN: ${{ env.PAT }}
+          QUEUE: ${{ env.QUEUE }}
         run: |
-          git clone -b main https://github.com/${{ env.QUEUE }} queue
+          git clone -b main https://github.com/$QUEUE queue
           cd queue
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           touch ${REPO##*/}
           git add ${REPO##*/}
           git commit -m "Enqueue ${REPO}"
+          git remote set-url --push origin https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/$QUEUE
           git push origin main
           cd ..
+          rm -rf queue
 
       - name: Check out
         uses: actions/checkout@v4
@@ -70,17 +75,21 @@ jobs:
       - name: Dequeue
         env:
           REPO: ${{ env.REPO }}
-          DESTINATION_REPO_PAT: ${{ env.PAT }}
+          GITHUB_USER: ${{ env.AUTHOR }}
+          GITHUB_TOKEN: ${{ env.PAT }}
+          QUEUE: ${{ env.QUEUE }}
         run: |
-          git clone -b main https://github.com/${{ env.QUEUE }} queue
+          git clone -b main https://github.com/$QUEUE queue
           cd queue
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           rm -rf ${REPO##*/}
           git add .
           git commit -m "Dequeue ${REPO}"
+          git remote set-url --push origin https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/$QUEUE
           git push origin main
           cd ..
+          rm -rf queue
 
   release:
     name: Release
