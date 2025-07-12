@@ -105,8 +105,8 @@ jobs:
           echo "VERSION=$(cat VERSION | cut -d'v' -f2)" >>"$GITHUB_ENV"
           echo "DATE=$(date -u +'%Y%m%d')" >>"$GITHUB_ENV"
 
-      - name: Download blissos-calamares
-        id: download-blissos-calamares
+      - name: Download artifacts
+        id: download-artifacts
         uses: actions/download-artifact@v4
         with:
           path: out
@@ -114,7 +114,7 @@ jobs:
           merge-multiple: true
 
       - name: List Files
-        run: ls -R ${{ steps.download-blissos-calamares.outputs.download-path }}
+        run: ls -R ${{ steps.download-artifacts.outputs.download-path }}
 
       - uses: "softprops/action-gh-release@v2.1.0"
         with:
@@ -123,4 +123,4 @@ jobs:
           tag_name: "${{ env.VERSION }}-${{ env.REVISION }}"
           name: "Release ${{ env.VERSION }}-${{ env.REVISION }}-${{ env.DATE }}"
           files: |
-            ${{ steps.download-blissos-calamares.outputs.download-path }}/*
+            ${{ steps.download-artifacts.outputs.download-path }}/*

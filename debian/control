@@ -5,9 +5,9 @@ Maintainer: Bùi Gia Viện <shadichy@blisslabs.org>
 Build-Depends: debhelper-compat (= 13), libglib2.0-bin
 Standards-Version: 4.6.2
 Rules-Requires-Root: no
-Homepage: https://github.com/BlissOS/calamares_branding_blissos
-Vcs-Git: https://github.com/BlissOS/calamares_branding_blissos
-Vcs-Browser: https://github.com/BlissOS/calamares_branding_blissos
+Homepage: https://github.com/Ananda-Aropa/calamares_branding_blissos
+Vcs-Git: https://github.com/Ananda-Aropa/calamares_branding_blissos
+Vcs-Browser: https://github.com/Ananda-Aropa/calamares_branding_blissos
 
 Package: calamares-settings-blissos
 Architecture: all
