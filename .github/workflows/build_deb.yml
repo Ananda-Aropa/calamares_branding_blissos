@@ -29,6 +29,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Enqueue
+        if: always()
         env:
           REPO: ${{ env.REPO }}
           GITHUB_USER: ${{ env.AUTHOR }}
@@ -76,6 +77,7 @@ jobs:
             *_*_*.udeb
 
       - name: Dequeue
+        if: always()
         env:
           REPO: ${{ env.REPO }}
           GITHUB_USER: ${{ env.AUTHOR }}
