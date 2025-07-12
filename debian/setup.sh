@@ -10,7 +10,7 @@ MAINTAINER=$(git log -1 --pretty=format:'%an <%ae>')
 VERSION=$(cat ../VERSION | cut -d'v' -f2)
 REVISION=${REVISION:-0}
 
-PACKAGE_NAME=$(grep 'Source:' debian/control | cut -d' ' -f2)
+PACKAGE_NAME=$(grep 'Source:' control | cut -d' ' -f2)
 
 # Gen changelog (from latest commit)
 MSG=$(git log -1 --pretty=format:'%s')
