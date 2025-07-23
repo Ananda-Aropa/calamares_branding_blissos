@@ -14,6 +14,8 @@ Architecture: all
 Depends: calamares
          ${misc:Depends}
 Provides: calamares-settings
+Conflicts: calamares-settings
+Replaces: calamares-settings
 Description: BlissOS theme and settings for the Calamares Installer
  Calamares is a generic installer framework for Linux distributions.
  By default, it contains a set of boilerplate wording and images. This
